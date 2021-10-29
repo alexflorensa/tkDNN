@@ -159,6 +159,14 @@ target_link_libraries(demoTracker tkDNN)
 add_executable(seg_demo demo/demo/seg_demo.cpp)
 target_link_libraries(seg_demo tkDNN)
 
+option(BUILD_SHARED_LIBS "Specifies the type of libraries (SHARED or STATIC) to build" ON)
+if (BUILD_SHARED_LIBS)
+    add_library(tkDNNlib SHARED src/tkdnnlib.cpp)
+    target_compile_definitions(tkDNNlib PRIVATE LIB_EXPORTS=1)
+    target_compile_definitions(tkDNNlib PRIVATE -DDEMO_EXPORTS)
+    target_link_libraries(tkDNNlib tkDNN)
+endif()
+
 #-------------------------------------------------------------------------------
 # Install
 #-------------------------------------------------------------------------------
