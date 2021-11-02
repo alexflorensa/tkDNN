@@ -1,4 +1,4 @@
-#include "../include/tkdnnlib.h"
+#include "../include/PythonApi.h"
 
 extern "C"
 {

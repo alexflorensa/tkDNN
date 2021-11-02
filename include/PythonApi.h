@@ -1,5 +1,5 @@
-#ifndef TKDNN_TKDNNLIB_H
-#define TKDNN_TKDNNLIB_H
+#ifndef TKDNN_PYTHONAPI_H
+#define TKDNN_PYTHONAPI_H
 
 #include <iostream>
 #include <signal.h>
@@ -33,5 +33,5 @@ typedef struct {
 tk::dnn::Yolo3Detection* load_network(char* net_cfg, int n_classes, int n_batch);
 
 };
-#endif //TKDNN_TKDNNLIB_H
+#endif //TKDNN_PYTHONAPI_H
 

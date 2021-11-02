@@ -98,7 +98,7 @@ target_link_libraries(demo tkDNN)
 
 option(BUILD_SHARED_LIBS "Specifies the type of libraries (SHARED or STATIC) to build" ON)
 if (BUILD_SHARED_LIBS)
-    add_library(tkDNNlib SHARED src/tkdnnlib.cpp)
+    add_library(tkDNNlib SHARED src/PythonApi.cpp)
     target_compile_definitions(tkDNNlib PRIVATE LIB_EXPORTS=1)
     target_compile_definitions(tkDNNlib PRIVATE -DDEMO_EXPORTS)
     target_link_libraries(tkDNNlib tkDNN)
