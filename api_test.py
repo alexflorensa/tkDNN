@@ -67,7 +67,7 @@ def resizePadding(image, height, width):
     image = cv2.copyMakeBorder(image, top, bottom, left, right, cv2.BORDER_CONSTANT)
     return image
 
-def detect_image(net, meta, darknet_image, thresh=.5):
+def detect_image(net, darknet_image, thresh=.5):
     num = c_int(0)
 
     pnum = pointer(num)
@@ -115,19 +115,14 @@ class YOLO4RT(object):
     def __init__(self,
                  input_size=512,
                  weight_file='./yolo4_fp16.rt',
-                 metaPath='Models/yolo4/coco.data',
-                 nms=0.2,
-                 conf_thres=0.3,
-                 device='cuda'):
+                 conf_thres=0.3):
         self.input_size = input_size
         self.metaMain =None
         self.model = load_network(weight_file.encode("ascii"), 80, 1)
         self.darknet_image = make_image(input_size, input_size, 3)
         self.thresh = conf_thres
-        # self.resize_fn = ResizePadding(input_size, input_size)
-        # self.transf_fn = transforms.ToTensor()
 
-    def detect(self, image, need_resize=True, expand_bb=5):
+    def detect(self, image, need_resize=True):
         try:
             if need_resize:
                 frame_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
@@ -137,7 +132,7 @@ class YOLO4RT(object):
             frame_data = image.ctypes.data_as(c_char_p)
             copy_image_from_bytes(self.darknet_image, frame_data)
 
-            detections = detect_image(self.model, self.metaMain, self.darknet_image, thresh=self.thresh)
+            detections = detect_image(self.model, self.darknet_image, thresh=self.thresh)
 
             return detections
         except Exception as e_s:

@@ -8,7 +8,7 @@
 #include <mutex>
 #include <malloc.h>
 #define PY_SSIZE_T_CLEAN
-#include <Python.h>
+#include "Python.h"
 #include "Yolo3Detection.h"
 #include "utils.h"
 

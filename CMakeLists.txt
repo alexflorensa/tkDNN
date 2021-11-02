@@ -2,14 +2,8 @@ cmake_minimum_required(VERSION 3.15)
 
 project(tkDNN)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
-if (UNIX)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -fPIC -Wno-deprecated-declarations -Wno-unused-variable ")
-endif ()
-if (WIN32)
-    set(CMAKE_CXX_STANDARD 11)
-    set(CMAKE_CXX_FLAGS "/O2 /FS /EHsc")
-    set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
-endif (WIN32)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -fPIC -Wno-deprecated-declarations -Wno-unused-variable ")
+
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include/tkDNN)
 
 # project specific flags
@@ -96,7 +90,7 @@ include_directories(${PYTHON_INCLUDE_DIRS})
 
 option(BUILD_SHARED_LIBS "Specifies the type of libraries (SHARED or STATIC) to build" ON)
 if (BUILD_SHARED_LIBS)
-    add_library(PythonApi SHARED src/PythonApi.cpp)
+    add_library(PythonApi SHARED api/PythonApi.cpp)
     target_compile_definitions(PythonApi PRIVATE LIB_EXPORTS=1)
     target_compile_definitions(PythonApi PRIVATE -DDEMO_EXPORTS)
     target_link_libraries(PythonApi tkDNN)
