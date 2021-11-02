@@ -93,8 +93,6 @@ def loop_detect(detect_m, video_path):
                            interpolation=cv2.INTER_LINEAR)
         detections = detect_m.detect(image, need_resize=False)
         cnt += 1
-        for det in detections:
-            print(det)
     end = time.time()
     print("frame:{},time:{:.3f},FPS:{:.2f}".format(cnt, end-start, cnt/(end-start)))
     stream.release()
@@ -141,5 +139,5 @@ class YOLO4RT(object):
 
 if __name__ == '__main__':
     input_path = "/home/alex/Projects/jd/val-videos/korean_walking.mp4"
-    detect_m = YOLO4RT(weight_file="/home/alex/Projects/jd/covid/v23/yolo4_fp32.rt")
+    detect_m = YOLO4RT(weight_file="build/yolo4_fp32.rt")
     loop_detect(detect_m, input_path)
