@@ -4,9 +4,10 @@ if(CUDA_FOUND)
   set(CUDNN_LIBRARY ${CUDA_cudnn_LIBRARY} CACHE FILEPATH "location of the cuDNN library")
   unset(CUDA_cudnn_LIBRARY CACHE)
 
-  find_cuda_helper_libs(nvinfer)
-  set(NVINFER_LIBRARY ${CUDA_nvinfer_LIBRARY} CACHE FILEPATH "location of the nvinfer library")
-  unset(CUDA_nvinfer_LIBRARY CACHE)
+  set(NVINFER_LIBRARY libnvinfer.so)
+  include_directories(/etc/TensorRT-7.2.1.6/include)
+  link_directories(/etc/TensorRT-7.2.1.6/lib)
+
 endif()
 
 # find the include

@@ -9,7 +9,7 @@ void copy_image_from_bytes(Image im, unsigned char *pdata) {
 }
 
 Image make_image(int w, int h, int c) {
-    Image out{.w=w, .h=h, .c=c, .data=0}
+    Image out{.w=w, .h=h, .c=c, .data=0};
     out.data = (float *) xcalloc(h * w * c, sizeof(float));
     return out;
 }

@@ -36,7 +36,6 @@ set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS} --maxrregcount=32)
 find_package(CUDNN REQUIRED)
 include_directories(${CUDNN_INCLUDE_DIR})
 
-
 # compile
 file(GLOB tkdnn_CUSRC "src/kernels/*.cu" "src/sorting.cu")
 cuda_include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include ${CUDA_INCLUDE_DIRS} ${CUDNN_INCLUDE_DIRS})

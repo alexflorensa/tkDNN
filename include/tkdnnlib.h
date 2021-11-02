@@ -1,6 +1,17 @@
 #ifndef TKDNN_TKDNNLIB_H
 #define TKDNN_TKDNNLIB_H
 
+#include <iostream>
+#include <signal.h>
+#include <stdlib.h>     /* srand, rand */
+#include <unistd.h>
+#include <mutex>
+#include <malloc.h>
+#include "CenternetDetection.h"
+#include "MobilenetDetection.h"
+#include "Yolo3Detection.h"
+#include "utils.h"
+
 extern "C" {
 
 typedef struct {
