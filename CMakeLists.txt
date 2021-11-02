@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.15)
 project(tkDNN)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 if (UNIX)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -fPIC -Wno-deprecated-declarations -Wno-unused-variable ")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -fPIC -Wno-deprecated-declarations -Wno-unused-variable ")
 endif ()
 if (WIN32)
     set(CMAKE_CXX_STANDARD 11)
@@ -24,11 +24,6 @@ else ()
     add_definitions(-DTKDNN_PATH="${CMAKE_CURRENT_SOURCE_DIR}")
 endif ()
 
-#-------------------------------------------------------------------------------
-# Python
-#-------------------------------------------------------------------------------
-find_package(PythonLibs REQUIRED)
-include_directories(${PYTHON_INCLUDE_DIRS})
 
 #-------------------------------------------------------------------------------
 # CUDA
@@ -96,21 +91,20 @@ target_link_libraries(map_demo tkDNN)
 add_executable(demo demo/demo/demo.cpp)
 target_link_libraries(demo tkDNN)
 
+find_package(PythonLibs REQUIRED)
+include_directories(${PYTHON_INCLUDE_DIRS})
+
 option(BUILD_SHARED_LIBS "Specifies the type of libraries (SHARED or STATIC) to build" ON)
 if (BUILD_SHARED_LIBS)
-    add_library(tkDNNlib SHARED src/PythonApi.cpp)
-    target_compile_definitions(tkDNNlib PRIVATE LIB_EXPORTS=1)
-    target_compile_definitions(tkDNNlib PRIVATE -DDEMO_EXPORTS)
-    target_link_libraries(tkDNNlib tkDNN)
+    add_library(PythonApi SHARED src/PythonApi.cpp)
+    target_compile_definitions(PythonApi PRIVATE LIB_EXPORTS=1)
+    target_compile_definitions(PythonApi PRIVATE -DDEMO_EXPORTS)
+    target_link_libraries(PythonApi tkDNN)
 endif ()
 
 #-------------------------------------------------------------------------------
 # Install
 #-------------------------------------------------------------------------------
-#if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-#    set (CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/install" 
-#         CACHE PATH "default install path" FORCE)
-#endif()
 message("install dir:" ${CMAKE_INSTALL_PREFIX})
 install(DIRECTORY include/ DESTINATION include/)
 install(TARGETS tkDNN kernels DESTINATION lib)
