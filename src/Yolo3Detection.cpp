@@ -11,7 +11,7 @@ bool Yolo3Detection::init(const std::string& tensor_path, const int n_classes, c
 
     nBatches = n_batches;
     confThreshold = conf_thresh;
-    tk::dnn::dataDim_t idim = netRT->input_dim;    
+    tk::dnn::dataDim_t idim = netRT->input_dim;
     idim.n = nBatches;
 
     if(netRT->pluginFactory->n_yolos < 2 ) {
@@ -43,7 +43,7 @@ bool Yolo3Detection::init(const std::string& tensor_path, const int n_classes, c
 #endif
     checkCuda(cudaMalloc(&input_d, sizeof(dnnType)*idim.tot()));
 
-    // class colors precompute    
+    // class colors precompute
     for(int c=0; c<classes; c++) {
         int offset = c*123457 % classes;
         float r = getColor(2, offset, classes);
@@ -54,7 +54,7 @@ bool Yolo3Detection::init(const std::string& tensor_path, const int n_classes, c
 
     classesNames = getYoloLayer()->classesNames;
     return true;
-} 
+}
 
 void Yolo3Detection::preprocess(cv::Mat &frame, const int bi){
 #ifdef OPENCV_CUDACONTRIB
@@ -62,7 +62,7 @@ void Yolo3Detection::preprocess(cv::Mat &frame, const int bi){
     orig_img = cv::cuda::GpuMat(frame);
     cv::cuda::resize(orig_img, img_resized, cv::Size(netRT->input_dim.w, netRT->input_dim.h));
 
-    img_resized.convertTo(imagePreproc, CV_32FC3, 1/255.0); 
+    img_resized.convertTo(imagePreproc, CV_32FC3, 1/255.0);
 
     //split channels
     cv::cuda::split(imagePreproc,bgr);//split source
@@ -75,8 +75,9 @@ void Yolo3Detection::preprocess(cv::Mat &frame, const int bi){
         checkCuda( cudaMemcpy(input_d + i*size + netRT->input_dim.tot()*bi, (float*)bgr_h.data, size*sizeof(dnnType), cudaMemcpyHostToDevice));
     }
 #else
+    printf("(%i, %i)\n",frame.rows, frame.cols);
     cv::resize(frame, frame, cv::Size(netRT->input_dim.w, netRT->input_dim.h));
-    frame.convertTo(imagePreproc, CV_32FC3, 1/255.0); 
+    frame.convertTo(imagePreproc, CV_32FC3, 1/255.0);
 
     //split channels
     cv::split(imagePreproc,bgr);//split source
@@ -85,7 +86,7 @@ void Yolo3Detection::preprocess(cv::Mat &frame, const int bi){
     for(int i=0; i<netRT->input_dim.c; i++) {
         int idx = i*imagePreproc.rows*imagePreproc.cols;
         int ch = netRT->input_dim.c-1 -i;
-        memcpy((void*)&input[idx + netRT->input_dim.tot()*bi], (void*)bgr[ch].data, imagePreproc.rows*imagePreproc.cols*sizeof(dnnType));     
+        memcpy((void*)&input[idx + netRT->input_dim.tot()*bi], (void*)bgr[ch].data, imagePreproc.rows*imagePreproc.cols*sizeof(dnnType));
     }
     checkCuda(cudaMemcpyAsync(input_d + netRT->input_dim.tot()*bi, input + netRT->input_dim.tot()*bi, netRT->input_dim.tot()*sizeof(dnnType), cudaMemcpyHostToDevice, netRT->stream));
 #endif
@@ -124,7 +125,7 @@ void Yolo3Detection::postprocess(const int bi, const bool mAP){
         x1 = x_ratio*x1;
         y0 = y_ratio*y0;
         y1 = y_ratio*y1;
-        
+
         for(int c=0; c<classes; c++) {
             if(dets[j].prob[c] >= confThreshold) {
                 int obj_class = c;
@@ -140,7 +141,7 @@ void Yolo3Detection::postprocess(const int bi, const bool mAP){
 
                 // FIXME: this shuld be useless
                 // if(mAP)
-                //     for(int c=0; c<classes; c++) 
+                //     for(int c=0; c<classes; c++)
                 //         res.probs.push_back(dets[j].prob[c]);
 
                 detected.push_back(res);
@@ -155,7 +156,7 @@ void Yolo3Detection::postprocess(const int bi, const bool mAP){
 tk::dnn::Yolo* Yolo3Detection::getYoloLayer(int n) {
     if(n<3)
         return yolo[n];
-    else 
+    else
         return nullptr;
 }
 

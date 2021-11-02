@@ -1,4 +1,5 @@
-from ctypes import CDLL, RTLD_GLOBAL, c_int, POINTER, c_float, Structure, c_char_p, c_void_p, c_char, py_object, pointer
+from ctypes import CDLL, RTLD_GLOBAL, c_int, POINTER, c_float, Structure, c_char_p, c_void_p, c_char, py_object, \
+    pointer, Array
 import cv2
 import time
 
@@ -28,21 +29,18 @@ class DETECTION(Structure):
 lib = CDLL("./build/libPythonApi.so", RTLD_GLOBAL)
 
 load_network = lib.load_network
-load_network.argtypes = [c_char_p, c_int, c_int]
+load_network.argtypes = [c_char_p, c_int]
 load_network.restype = c_void_p
-
-copy_image_from_bytes = lib.copy_image_from_bytes
-copy_image_from_bytes.argtypes = [IMAGE, c_char_p]
 
 make_image = lib.make_image
 make_image.argtypes = [c_int, c_int, c_int]
 make_image.restype = IMAGE
 
 do_inference = lib.do_inference
-do_inference.argtypes = [c_void_p, IMAGE]
+do_inference.argtypes = [c_void_p, IMAGE, c_char_p]
 
 get_output = lib.get_output
-get_output.argtypes = [c_void_p, c_float, c_int, POINTER(c_int)]
+get_output.argtypes = [c_void_p, c_float, c_int]
 get_output.restype = py_object
 
 
@@ -67,12 +65,9 @@ def resizePadding(image, height, width):
     image = cv2.copyMakeBorder(image, top, bottom, left, right, cv2.BORDER_CONSTANT)
     return image
 
-def detect_image(net, darknet_image, thresh=.5):
-    num = c_int(0)
-
-    pnum = pointer(num)
-    do_inference(net, darknet_image)
-    dets = get_output(net, 0.5, 0, pnum)
+def detect_image(net, darknet_image, frame_data, thresh=.5):
+    do_inference(net, darknet_image, frame_data)
+    dets = get_output(net, 0.5, 0)
     print(dets)
 
     return dets
@@ -87,11 +82,9 @@ def loop_detect(detect_m, video_path):
         if ret is False:
             break
         # image = resizePadding(image, 512, 512)
-        # frame_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        image = cv2.resize(image,
-                           (512, 512),
-                           interpolation=cv2.INTER_LINEAR)
-        detections = detect_m.detect(image, need_resize=False)
+        frame_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        image = cv2.resize(frame_rgb, (512, 512), interpolation=cv2.INTER_LINEAR)
+        detections = detect_m.detect(image)
         cnt += 1
     end = time.time()
     print("frame:{},time:{:.3f},FPS:{:.2f}".format(cnt, end-start, cnt/(end-start)))
@@ -116,21 +109,14 @@ class YOLO4RT(object):
                  conf_thres=0.3):
         self.input_size = input_size
         self.metaMain =None
-        self.model = load_network(weight_file.encode("ascii"), 80, 1)
+        self.model = load_network(weight_file.encode("ascii"), 1)
         self.darknet_image = make_image(input_size, input_size, 3)
         self.thresh = conf_thres
 
-    def detect(self, image, need_resize=True):
+    def detect(self, image):
         try:
-            if need_resize:
-                frame_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-                image = cv2.resize(frame_rgb,
-                                   (self.input_size, self.input_size),
-                                   interpolation=cv2.INTER_LINEAR)
             frame_data = image.ctypes.data_as(c_char_p)
-            copy_image_from_bytes(self.darknet_image, frame_data)
-
-            detections = detect_image(self.model, self.darknet_image, thresh=self.thresh)
+            detections = detect_image(self.model, self.darknet_image, frame_data, thresh=self.thresh)
 
             return detections
         except Exception as e_s:

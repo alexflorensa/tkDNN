@@ -41,7 +41,7 @@ namespace tk {
 
             cv::Scalar colors[256];
 
-            int nBatches = 1;
+
 
 #ifdef OPENCV_CUDACONTRIB
             cv::cuda::GpuMat bgr[3];
@@ -71,6 +71,7 @@ namespace tk {
             virtual void postprocess(const int bi = 0, const bool mAP = false) = 0;
 
         public:
+            int nBatches = 1;
             int classes = 0;
             float confThreshold = 0.3; /*threshold on the confidence of the boxes*/
 

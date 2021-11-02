@@ -1,11 +1,7 @@
 #include "PythonApi.h"
+
 extern "C"
 {
-
-
-void copy_image_from_bytes(Image im, unsigned char *pdata) {
-    memcpy(im.data, pdata, im.h * im.w * im.c);
-}
 
 Image make_image(int w, int h, int c) {
     Image out{.w=w, .h=h, .c=c, .data=0};
@@ -13,16 +9,16 @@ Image make_image(int w, int h, int c) {
     return out;
 }
 
-tk::dnn::Yolo3Detection *load_network(char *net_cfg, int n_classes, int n_batch) {
+tk::dnn::Yolo3Detection *load_network(char *net_cfg, int n_batch) {
     std::string net = std::string(net_cfg);
     tk::dnn::Yolo3Detection *detNN = new tk::dnn::Yolo3Detection;
-    detNN->init(net, n_classes, n_batch);
+    detNN->init(net, 80, n_batch);
     return detNN;
 }
-#include <typeinfo>
-void do_inference(tk::dnn::Yolo3Detection *net, Image im) {
+void do_inference(tk::dnn::Yolo3Detection *net, Image im, unsigned char *pdata) {
     std::vector<cv::Mat> batch_dnn_input;
 
+    memcpy(im.data, pdata, im.h * im.w * im.c);
     cv::Mat frame(im.h, im.w, CV_8UC3, (unsigned char *) im.data);
     batch_dnn_input.push_back(frame);
     net->update(batch_dnn_input, 1);
@@ -62,11 +58,12 @@ PyObject *BoundingBoxToPyObject(BBox &bbox) {
     return pyBoundingBox;
 }
 
-PyObject *get_output(tk::dnn::Yolo3Detection *net, float thresh, int batch_num, int *pnum) {
-    Detection *dets = get_network_boxes(net, thresh, batch_num, pnum);
+PyObject *get_output(tk::dnn::Yolo3Detection *net, float thresh, int batch_num) {
+    int pnum;
+    Detection *dets = get_network_boxes(net, thresh, batch_num, &pnum);
     PyGILState_STATE gilState = PyGILState_Ensure();
     PyObject *finalDets = PyDict_New();
-    for (int i = 0; i < *pnum; i++) {
+    for (int i = 0; i < pnum; i++) {
         Detection &det = dets[i];
         PyObject *key = PyUnicode_FromString(det.name);
         PyObject *detList;

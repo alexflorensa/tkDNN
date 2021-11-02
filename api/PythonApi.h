@@ -32,8 +32,7 @@ typedef struct {
     char name[20];
 } Detection;
 
-tk::dnn::Yolo3Detection* load_network(char* net_cfg, int n_classes, int n_batch);
-PyObject *get_output(tk::dnn::Yolo3Detection *net, float thresh, int batch_num, int *pnum);
+tk::dnn::Yolo3Detection *load_network(char *net_cfg, int n_batch);
+PyObject *get_output(tk::dnn::Yolo3Detection *net, float thresh, int batch_num);
 };
 #endif //TKDNN_PYTHONAPI_H
-
