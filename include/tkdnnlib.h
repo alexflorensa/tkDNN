@@ -7,8 +7,6 @@
 #include <unistd.h>
 #include <mutex>
 #include <malloc.h>
-#include "CenternetDetection.h"
-#include "MobilenetDetection.h"
 #include "Yolo3Detection.h"
 #include "utils.h"
 

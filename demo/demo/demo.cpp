@@ -4,8 +4,6 @@
 //#include <unistd.h>
 #include <mutex>
 
-#include "CenternetDetection.h"
-#include "MobilenetDetection.h"
 #include "Yolo3Detection.h"
 
 bool gRun;
@@ -56,26 +54,10 @@ int main(int argc, char *argv[]) {
         SAVE_RESULT = true;
 
     tk::dnn::Yolo3Detection yolo;
-    tk::dnn::CenternetDetection cnet;
-    tk::dnn::MobilenetDetection mbnet;  
 
-    tk::dnn::DetectionNN *detNN;  
+    tk::dnn::DetectionNN *detNN;
 
-    switch(ntype)
-    {
-        case 'y':
-            detNN = &yolo;
-            break;
-        case 'c':
-            detNN = &cnet;
-            break;
-        case 'm':
-            detNN = &mbnet;
-            n_classes++;
-            break;
-        default:
-        FatalError("Network type not allowed (3rd parameter)\n");
-    }
+    detNN = &yolo;
 
     detNN->init(net, n_classes, n_batch, conf_thresh);
 

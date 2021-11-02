@@ -15,8 +15,6 @@
 #include <opencv2/imgproc/imgproc.hpp>
 
 #include "Yolo3Detection.h"
-#include "CenternetDetection.h"
-#include "MobilenetDetection.h"
 
 #include "evaluation.h"
 
@@ -98,24 +96,10 @@ int main(int argc, char *argv[])
 
     // instantiate detector
     tk::dnn::Yolo3Detection yolo;
-    tk::dnn::CenternetDetection cnet;
-    tk::dnn::MobilenetDetection mbnet;
-    tk::dnn::DetectionNN *detNN;  
-    int n_classes = classes;   
-    switch(ntype){
-        case 'y':
-            detNN = &yolo;
-            break;
-        case 'c':
-            detNN = &cnet;
-            break;
-        case 'm':
-            detNN = &mbnet;
-            n_classes++;
-            break;
-        default:
-            FatalError("Network type not allowed (3rd parameter)\n");
-    }
+
+    tk::dnn::DetectionNN *detNN;
+    detNN = &yolo;
+    int n_classes = classes;
     detNN->init(net, n_classes, 1, conf_thresh);
 
     //read images 
