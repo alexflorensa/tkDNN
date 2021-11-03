@@ -33,7 +33,7 @@ load_network.argtypes = [c_char_p, c_int]
 load_network.restype = c_void_p
 
 make_image = lib.make_image
-make_image.argtypes = [c_int, c_int, c_int]
+make_image.argtypes = [c_int, c_int, c_int, c_int]
 make_image.restype = IMAGE
 
 do_inference = lib.do_inference

@@ -3,25 +3,35 @@
 extern "C"
 {
 
-Image make_image(int w, int h, int c) {
-    Image out{.w=w, .h=h, .c=c, .data=0};
-    out.data = (float *) xcalloc(h * w * c, sizeof(float));
+Image *make_images(int w, int h, int c, int batch_size) {
+    Image *out = (Image *) xcalloc(batch_size, sizeof(Image));
+    for (int i = 0; i < batch_size; i++) {
+        out[i].w=w;
+        out[i].h=h;
+        out[i].c=c;
+        out[i].data = (float *) xcalloc(h * w * c, sizeof(float));
+    }
     return out;
 }
+
+void copy_image_from_bytes(Image im, unsigned char *pdata) {
+    memcpy(im.data, pdata, im.h * im.w * im.c);
+}
+
 
 tk::dnn::Yolo3Detection *load_network(char *net_cfg, int n_batch) {
     std::string net = std::string(net_cfg);
     tk::dnn::Yolo3Detection *detNN = new tk::dnn::Yolo3Detection;
-    detNN->init(net, 80, n_batch);
+    detNN->init(net, 80, n_batch, 0.3);
     return detNN;
 }
-void do_inference(tk::dnn::Yolo3Detection *net, Image im, unsigned char *pdata) {
+void do_inference(tk::dnn::Yolo3Detection *net, Image *images) {
     std::vector<cv::Mat> batch_dnn_input;
-
-    memcpy(im.data, pdata, im.h * im.w * im.c);
-    cv::Mat frame(im.h, im.w, CV_8UC3, (unsigned char *) im.data);
-    batch_dnn_input.push_back(frame);
-    net->update(batch_dnn_input, 1);
+    for (int i = 0; i < net->nBatches; i++) {
+        cv::Mat frame(images[i].h, images[i].w, CV_8UC3, (unsigned char *) images[i].data);
+        batch_dnn_input.push_back(frame);
+    }
+    net->update(batch_dnn_input, net->nBatches);
 
 }
 

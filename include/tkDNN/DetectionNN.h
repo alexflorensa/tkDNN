@@ -107,7 +107,7 @@ namespace tk {
              * @param mAP set to true only if all the probabilities for a bounding
              *            box are needed, as in some cases for the mAP calculation
              */
-            void update(std::vector<cv::Mat> &frames, const int cur_batches = 1, bool save_times = false,
+            void update(std::vector<cv::Mat> &frames, const int cur_batches, bool save_times = false,
                         std::ofstream *times = nullptr, const bool mAP = false) {
                 if (save_times && times == nullptr) FatalError("save_times set to true, but no valid ofstream given");
                 if (cur_batches > nBatches) FatalError("A batch size greater than nBatches cannot be used");

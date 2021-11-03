@@ -75,7 +75,6 @@ void Yolo3Detection::preprocess(cv::Mat &frame, const int bi){
         checkCuda( cudaMemcpy(input_d + i*size + netRT->input_dim.tot()*bi, (float*)bgr_h.data, size*sizeof(dnnType), cudaMemcpyHostToDevice));
     }
 #else
-    printf("(%i, %i)\n",frame.rows, frame.cols);
     cv::resize(frame, frame, cv::Size(netRT->input_dim.w, netRT->input_dim.h));
     frame.convertTo(imagePreproc, CV_32FC3, 1/255.0);
 
