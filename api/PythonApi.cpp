@@ -1,14 +1,12 @@
 #include "PythonApi.h"
 
-extern "C"
-{
 
 Image *make_images(int w, int h, int c, int batch_size) {
     Image *out = (Image *) xcalloc(batch_size, sizeof(Image));
     for (int i = 0; i < batch_size; i++) {
-        out[i].w=w;
-        out[i].h=h;
-        out[i].c=c;
+        out[i].w = w;
+        out[i].h = h;
+        out[i].c = c;
         out[i].data = (float *) xcalloc(h * w * c, sizeof(float));
     }
     return out;
@@ -25,6 +23,7 @@ tk::dnn::Yolo3Detection *load_network(char *net_cfg, int n_batch) {
     detNN->init(net, 80, n_batch, 0.3);
     return detNN;
 }
+
 void do_inference(tk::dnn::Yolo3Detection *net, Image *images) {
     std::vector<cv::Mat> batch_dnn_input;
     for (int i = 0; i < net->nBatches; i++) {
@@ -43,9 +42,9 @@ Detection *get_network_boxes(tk::dnn::Yolo3Detection *net, float thresh, int bat
     Detection *dets = (Detection *) xcalloc(batchDetected[batch_num].size(), sizeof(Detection));
 
     for (auto &det: batchDetected[batch_num]) {
-        if (det.prob > thresh) {
+        if (det.prob > thresh && isPerson(classesName[det.cl].c_str())) {
             dets[nboxes].cl = det.cl;
-            strcpy(dets[nboxes].name, classesName[dets[nboxes].cl].c_str());
+            strcpy(dets[nboxes].name, classesName[det.cl].c_str());
             dets[nboxes].bbox.x = det.x;
             dets[nboxes].bbox.y = det.y;
             dets[nboxes].bbox.w = det.w;
@@ -57,7 +56,12 @@ Detection *get_network_boxes(tk::dnn::Yolo3Detection *net, float thresh, int bat
     if (pnum) *pnum = nboxes;
     return dets;
 }
+
+
+bool isPerson(const char *className) {
+    return strcmp(className, "person") == 0;
 }
+
 
 PyObject *BoundingBoxToPyObject(BBox &bbox) {
     PyObject *pyBoundingBox = PyTuple_New(4);
