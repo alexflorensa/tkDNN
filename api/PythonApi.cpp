@@ -34,7 +34,8 @@ void do_inference(tk::dnn::Yolo3Detection *net, Image *images) {
 
 }
 
-Detection *get_network_boxes(tk::dnn::Yolo3Detection *net, float thresh, int batch_num, int *pnum) {
+Detection *get_network_boxes(tk::dnn::Yolo3Detection *net, float thresh, int batch_num, int *pnum, int frame_height,
+                             int frame_width) {
     std::vector<std::vector<tk::dnn::box>> batchDetected;
     batchDetected = net->get_batch_detected();
     int nboxes = 0;
@@ -45,10 +46,10 @@ Detection *get_network_boxes(tk::dnn::Yolo3Detection *net, float thresh, int bat
         if (det.prob > thresh && isPerson(classesName[det.cl].c_str())) {
             dets[nboxes].cl = det.cl;
             strcpy(dets[nboxes].name, classesName[det.cl].c_str());
-            dets[nboxes].bbox.x = det.x;
-            dets[nboxes].bbox.y = det.y;
-            dets[nboxes].bbox.w = det.w;
-            dets[nboxes].bbox.h = det.h;
+            dets[nboxes].bbox.x = det.x / (float) net->input_size * (float) frame_width;
+            dets[nboxes].bbox.y = det.y / (float) net->input_size * (float) frame_height;
+            dets[nboxes].bbox.w = det.w / (float) net->input_size * (float) frame_width;
+            dets[nboxes].bbox.h = det.h / (float) net->input_size * (float) frame_height;
             dets[nboxes].prob = det.prob;
             nboxes += 1;
         }
@@ -72,9 +73,9 @@ PyObject *BoundingBoxToPyObject(BBox &bbox) {
     return pyBoundingBox;
 }
 
-PyObject *get_output(tk::dnn::Yolo3Detection *net, float thresh, int batch_num) {
+PyObject *get_output(tk::dnn::Yolo3Detection *net, float thresh, int batch_num, int frame_height, int frame_width) {
     int pnum;
-    Detection *dets = get_network_boxes(net, thresh, batch_num, &pnum);
+    Detection *dets = get_network_boxes(net, thresh, batch_num, &pnum, frame_height, frame_width);
     PyGILState_STATE gilState = PyGILState_Ensure();
     PyObject *finalDets = PyDict_New();
     for (int i = 0; i < pnum; i++) {

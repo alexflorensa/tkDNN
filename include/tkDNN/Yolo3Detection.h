@@ -21,6 +21,7 @@ private:
     cv::Mat bgr_h;
     
 public:
+    int input_size;
     Yolo3Detection() {};
     ~Yolo3Detection() {}; 
 
