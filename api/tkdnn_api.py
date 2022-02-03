@@ -13,10 +13,12 @@ lib = CDLL(TKDNN_LIB_PATH, RTLD_GLOBAL)
 
 
 class IMAGE(Structure):
-    _fields_ = [("w", c_int),
-                ("h", c_int),
-                ("c", c_int),
-                ("data", POINTER(c_float))]
+    _fields_ = [
+        ("w", c_int),
+        ("h", c_int),
+        ("c", c_int),
+        ("data", POINTER(c_float))
+    ]
 
 
 _load_network = lib.load_network
@@ -69,6 +71,7 @@ def do_inference(network: c_void_p, tkdnn_images: POINTER(IMAGE), images: List['
     :param network: Pointer to the network class
     :param tkdnn_images: List of Structures with a pointer to the allocated memory using make_image function.
     :param images: List of Numpy arrays that is the input images with the same dimension as the network input shape.
+    :param n_batch: Number of batches
     """
     for i in range(n_batch):
         _copy_image_from_bytes(tkdnn_images[i], images[i].ctypes.data_as(c_char_p))
@@ -76,10 +79,10 @@ def do_inference(network: c_void_p, tkdnn_images: POINTER(IMAGE), images: List['
 
 
 def get_output(
-        network: c_void_p,
-        threshold: float,
-        batch: int,
-        frame_shape: Tuple[int, int]
+    network: c_void_p,
+    threshold: float,
+    batch: int,
+    frame_shape: Tuple[int, int]
 ) -> Dict[str, List['Detection']]:
     """
 

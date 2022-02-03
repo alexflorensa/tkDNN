@@ -75,6 +75,9 @@ foreach (test_SRC ${darknet_SRC})
 endforeach ()
 
 
+add_executable(test_shelfnet_coco tests/shelfnet/shelfnet_coco.cpp)
+target_link_libraries(test_shelfnet_coco tkDNN)
+
 # DEMOS
 add_executable(test_rtinference tests/test_rtinference/rtinference.cpp)
 target_link_libraries(test_rtinference tkDNN)

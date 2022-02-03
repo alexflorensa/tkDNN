@@ -23,6 +23,7 @@
 #include <ios>
 #include <chrono>
 
+#include <yaml-cpp/yaml.h>
 
 #define dnnType float
 
@@ -160,5 +161,20 @@ void malloc_error();
 void calloc_error();
 
 void realloc_error();
+
+inline YAML::Node YAMLloadConf(const std::string& conf_file) {
+    std::cerr<<"Loading YAML: "<<conf_file<<"\n";
+    return YAML::LoadFile(conf_file);
+}
+
+template<typename T>
+inline T YAMLgetConf(YAML::Node conf, std::string key, T defaultVal) {
+    T val = defaultVal;
+    if(conf && conf[key]) {
+        val = conf[key].as<T>();
+    }
+    return val;
+}
+
 
 #endif //UTILS_H
